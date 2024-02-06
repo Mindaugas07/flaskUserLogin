@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Sveiki atvykę</h1>
+
+{% if visi_irasai %}
+{% for irasas in visi_irasai %}
+<hr>
+<p>{{irasas.data_laikas}}</p>
+<p>{{irasas.message}}</p>
+<a href="{{ 123 }}">Ištrinti</a>
+<a href="{{ 123 }}">Redaguoti</a>
+{% endfor %}
+{% endif %}
+
+
+{% endblock %}
