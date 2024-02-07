@@ -4,15 +4,17 @@
 
 <h1>Čia yra vartotojo {{ current_user.vardas}} įrašai</h1>
 
+{% if visi_irasai %}
+{% for irasas in visi_irasai %}
+<hr>
+<p>{{irasas.data_laikas}}</p>
+<p>{{irasas.message}}</p>
+<a href="{{ 123 }}">Ištrinti</a>
+<a href="{{ 123 }}">Redaguoti</a>
+{% endfor %}
+{% endif %}
 
-<form method="post" action="#">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.message.label(class="form-control-label") }}
-        {{ form.message(class="form-control") }}
-    </div>
-    {{ form.submit }}
-</form>
+
 
 
 

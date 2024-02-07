@@ -37,18 +37,24 @@ class Vartotojas(db.Model, UserMixin):
         "El. pašto adresas", db.String(120), unique=True, nullable=False
     )
     slaptazodis = db.Column("Slaptažodis", db.String(60), unique=True, nullable=False)
-    irasas_id = db.Column(db.Integer, db.ForeignKey("irasas.id"))
-    irasas = db.relationship("Irasas", cascade="all, delete", passive_deletes=True)
+    irasai = db.relationship("Irasas")
 
 
-class Irasas(db.Model):
+class Irasas(db.Model, UserMixin):
     __tablename__ = "irasas"
     id = db.Column(db.Integer, primary_key=True)
     data_laikas: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc)
     )
     message = db.Column(db.Text, nullable=False)
-    vartotojas = db.relationship("Vartotojas")
+    vartotojas_id = db.Column(db.Integer, db.ForeignKey("vartotojas.id"))
+    vartotojas = db.relationship(
+        "Vartotojas", cascade="all, delete", passive_deletes=True
+    )
+
+
+def get_pk(obj):
+    return str(obj)
 
 
 @login_manager.user_loader
@@ -56,15 +62,23 @@ def load_user(vartotojo_id):
     return Vartotojas.query.get(int(vartotojo_id))
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
+@login_required
 def index():
-    return render_template("index.html")
+    db.create_all()
+    form = forms.IrasoForma()
+    if form.validate_on_submit():
+        naujas_irasas = Irasas(message=form.irasas.data, vartotojas_id=current_user.id)
+        db.session.add(naujas_irasas)
+        db.session.commit()
+        return redirect(url_for("irasai"))
+    return render_template("index.html", form=form)
 
 
-@app.route("/")
-def all_irasai():
-    all_rows = Irasas.query.all()
-    return render_template("index.html", visi_irasai=all_rows)
+# @app.route("/")
+# def all_irasai():
+#     all_rows = Irasas.query.all()
+#     return render_template("index.html", visi_irasai=all_rows)
 
 
 @app.route("/registruotis", methods=["GET", "POST"])
@@ -122,21 +136,8 @@ def account():
 @app.route("/irasai")
 @login_required
 def irasai():
-    return render_template("irasai.html", title="Įrašai")
-
-
-@login_required
-def new_irasas():
-    db.create_all()
-    form = forms.IrasoForma()
-    if form.validate_on_submit():
-        naujas_irasas = Irasas(
-            message=form.message.data,
-        )
-        db.session.add(naujas_irasas)
-        db.session.commit()
-        return redirect(url_for("irasai"))
-    return render_template("irasai.html", form=form)
+    all_rows = Irasas.query.filter_by(vartotojas_id=current_user.id)
+    return render_template("irasai.html", title="Įrašai", visi_irasai=all_rows)
 
 
 if __name__ == "__main__":

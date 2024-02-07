@@ -32,5 +32,5 @@ class PrisijungimoForma(FlaskForm):
 
 
 class IrasoForma(FlaskForm):
-    irasas = StringField("Irasas", [DataRequired()])
-    submit = SubmitField("Prisijungti")
+    irasas = StringField("Įveskite žinutę.", [DataRequired()])
+    submit = SubmitField("Patvirtinti")
