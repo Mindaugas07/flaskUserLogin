@@ -9,8 +9,8 @@
 <hr>
 <p>{{irasas.data_laikas}}</p>
 <p>{{irasas.message}}</p>
-<a href="{{ 123 }}">Ištrinti</a>
-<a href="{{ 123 }}">Redaguoti</a>
+<a href="{{ url_for('delete', id=irasas['id']) }}">Ištrinti</a>
+<a href="{{ url_for('irasas_update', id=irasas['id']) }}">Redaguoti</a>
 {% endfor %}
 {% endif %}
 

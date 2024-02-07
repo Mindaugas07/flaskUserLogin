@@ -53,10 +53,6 @@ class Irasas(db.Model, UserMixin):
     )
 
 
-def get_pk(obj):
-    return str(obj)
-
-
 @login_manager.user_loader
 def load_user(vartotojo_id):
     return Vartotojas.query.get(int(vartotojo_id))
@@ -73,12 +69,6 @@ def index():
         db.session.commit()
         return redirect(url_for("irasai"))
     return render_template("index.html", form=form)
-
-
-# @app.route("/")
-# def all_irasai():
-#     all_rows = Irasas.query.all()
-#     return render_template("index.html", visi_irasai=all_rows)
 
 
 @app.route("/registruotis", methods=["GET", "POST"])
@@ -138,6 +128,28 @@ def account():
 def irasai():
     all_rows = Irasas.query.filter_by(vartotojas_id=current_user.id)
     return render_template("irasai.html", title="Įrašai", visi_irasai=all_rows)
+
+
+@app.route("/delete/<int:id>")
+def delete(id):
+    uzklausa = Irasas.query.get(id)
+    db.session.delete(uzklausa)
+    db.session.commit()
+    return redirect(url_for("irasai"))
+
+
+@app.route("/irasas_update/<int:id>", methods=["GET", "POST"])
+def irasas_update(id):
+    all_rows = Irasas.query.filter_by(vartotojas_id=current_user.id)
+    form = forms.IrasoForma()
+    irasas = Irasas.query.get(id)
+    print(irasas, id)
+    if form.validate_on_submit():
+        irasas.message = form.irasas.data
+        irasas.data_laikas = datetime.now(timezone.utc)
+        db.session.commit()
+        return redirect(url_for("irasai"))
+    return render_template("irasas_update.html", form=form, irasas=irasas)
 
 
 if __name__ == "__main__":
