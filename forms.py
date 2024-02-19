@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
+
 from wtforms import SubmitField, BooleanField, StringField, PasswordField
 from wtforms.validators import DataRequired, ValidationError, EqualTo, Email
 import app
+from flask_wtf.file import FileField, FileAllowed
 
 
 class RegistracijosForma(FlaskForm):
@@ -34,3 +36,12 @@ class PrisijungimoForma(FlaskForm):
 class IrasoForma(FlaskForm):
     irasas = StringField("Įveskite žinutę.", [DataRequired()])
     submit = SubmitField("Patvirtinti")
+
+
+class PaskyrosAtnaujinimoForma(FlaskForm):
+    vardas = StringField("Vardas", [DataRequired()])
+    el_pastas = StringField("El. paštas", [DataRequired()])
+    nuotrauka = FileField(
+        "Atnaujinti profilio nuotrauką", validators=[FileAllowed(["jpg", "png"])]
+    )
+    submit = SubmitField("Atnaujinti")
